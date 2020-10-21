@@ -30,6 +30,42 @@ from io import StringIO
 import re
 
 def loadtxt2d(intext):
+
+
+	# makes the rest of the file consistent regardless of whether
+	try:
+		dat = open(intext)
+	except:
+		dat = intext
+
+#	try:
+	output = []
+	for line in dat:
+		print(line)
+		newline = []
+		dat = line.rstrip("\n").lstrip("  ").split("   ")
+		for x in dat:
+			if len(x) > 5:
+				start = x[:-4]
+				end =x[-4:]
+				if "E" not in end:
+					end = "E"+end
+				final = start+end
+				ff = float(final)
+				newline += [ff]
+			else:
+				try:
+					newline += [float(x)]
+				except:
+					newline += [float(1.0)]
+
+		output += [newline]
+	output = numpy.array(output)
+	return output
+#	except:
+#		print("nope")
+
+
 	try:
 		return numpy.loadtxt(intext, ndmin=2)
 	except:
@@ -195,7 +231,7 @@ class Analyzer(object):
 			stats['global evidence error'] = Zerr
 			
 			text = ''.join(lines[3:])
-			
+
 			i = 0
 			modelines = text.split("\n\n")
 			mode = {
@@ -208,6 +244,7 @@ class Analyzer(object):
 			mode['Local Log-Evidence'.lower()] = Z
 			mode['Local Log-Evidence error'.lower()] = Zerr
 			t = self._read_table(modelines[0], title = "Parameters")
+
 			mode['mean'] = t[:,1].tolist()
 			mode['sigma'] = t[:,2].tolist()
 			mode['maximum'] = self._read_table(modelines[1])[:,1].tolist()
